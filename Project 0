@@ -1,0 +1,63 @@
+package projects;
+
+//to access JOptionPane
+import javax.swing.*;
+
+/**
+* 
+* @author amandakomsky
+*
+*/
+public class Project0 {
+	/**
+	 * This calls on the main function
+	 * 
+	 * The function will ask the user to input text by popping open a new window.
+	 * It will then calculate how many upper case letter E there are and how
+	 * many lower case letter e there are in the input text.
+	 * It will display a new window to the user, which tell how many there are of 
+	 * the upper and lower case e.  
+	 * 
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		/**
+		 * The text that the user will input
+		 */
+		String sentence;
+		/**
+		 * The count of lower case e's in the text.
+		 */
+		int numberOfe = 0;
+		/**
+		 * The count of upper case E's in the text.
+		 */
+		int numberOfE = 0;
+
+		while (true) { // allowing a continuous loop until the user chooses to quits the program.
+			// this line opens a single window and asks
+			// the user to input text
+			sentence = JOptionPane.showInputDialog(null, "Enter a sentence.");
+	
+			// This allows the user to input "stop" (either upper or lower case),
+            // and the program will quit.
+			if (sentence.equalsIgnoreCase("stop"))
+				System.exit(0);
+			// check to see how many letters are in each
+			for (int i=0; i<sentence.length(); i++){
+				if (sentence.charAt(i) == 'e') 	
+					numberOfe++;
+				if (sentence.charAt(i) == 'E')
+					numberOfE++;
+			}
+			// Open a single window which tells the user 
+			// how many lower case and upper case "e"s there are.
+			JOptionPane.showMessageDialog(null, "Number of lower case e's: " + numberOfe +  "\n" + 
+							    "Number of upper case e's: " + numberOfE);
+			
+			// need to reset the count of 'e'and 'E' back to zero
+			numberOfe = 0;
+			numberOfE = 0;
+		} //while
+	} //main
+} //class
