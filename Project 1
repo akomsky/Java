@@ -1,0 +1,155 @@
+package projects;
+import java.awt.*;
+/**
+ * 
+ * @author amandakomsky
+ *
+ */
+public class Project1 {
+	/**
+	 * This call on the main function
+	 * 
+	 * The function will import a text file of unsorted words and 
+	 * determine whether each string is an actual word. It will print
+	 * the invalid words to the console.  Then it will use Class ProjectGUI1
+	 * to create a JFrame and print the unsorted valid words to the left side
+	 * of the GUI and then print the sorted valid words on the right side
+	 * of the GUI
+	 * 
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		//using the constructor from class Project1GUI to
+		//create the setting of the JFrame
+		Project1GUI p1GUI = new Project1GUI("Project 1", 400,400, 100, 100);
+		/**
+		 *  Instantiating the word array that will be then be filled with Strings from
+		 *  the text file.
+		 */
+		String[] wordArray = new String[200];
+		/**
+		 * in order to determine the size of the String array and 
+		 * import the words using the method inputFromFile
+		 */
+		int subArrayLength = inputFromFile(args[0], wordArray);
+		/**
+		 * determining the size of the array 
+		 */
+		printWordstoJFrame( p1GUI, wordArray, subArrayLength);
+		//this method sorts create a JFrame and prints the sorted and unsorted valid words
+	}
+	/**
+	 * 
+	 * @param filename
+	 * @param words
+	 * @return
+	 */
+	private static int inputFromFile(String filename, String[] words) {
+		//this will read the strings in the file and put them into a String array (done above) if they are valid words.
+		//the words that are invalid will be printed to the console. 
+		TextFileInput in = new TextFileInput(filename);
+		int lengthFilled = 0; 
+		//representing the length filled of the word array. Each word will add 1.
+		String line = in.readLine();
+		while (lengthFilled < words.length && line != null) { 
+			//while loop keeps going until there is no more room in word array or 
+			//until there aren't any more words in the file.
+			if (isValid(line)) 
+				//checking each word to see if it's valid before adding it the the word array
+				words[lengthFilled++] = line;
+			else System.out.println("The word " + line + " is not a real word");
+			//print invalid words to the console 
+				line = in.readLine(); 
+				} //while
+		in.close();
+		return lengthFilled;
+	} // method inputFromFile
+	/**
+	 * 
+	 * @param word
+	 * @return
+	 */
+	private static boolean isValid(String word) { 
+		//this determines whether the Strings in the text are valid words (only letters)
+		for (int i=0; i<word.length(); i++) {
+			if (! Character.isLetter(word.charAt(i)) ) return false;
+		}
+		return true;
+	}
+	/**
+	 * 
+	 * @param p1GUI
+	 * @param words
+	 * @param size
+	 */
+	
+	public static void printWordstoJFrame(Project1GUI p1GUI, String [] words, int size) {
+		// this is used to connect with class Project1GUI and print the words into a JFrame
+		Container myContentPane = p1GUI.getContentPane();
+		TextArea unsortedWords = new TextArea();
+		TextArea sortedWords = new TextArea();
+		p1GUI.setLayout(new GridLayout(1,2));
+		// use the GrisLayout in order to create two sides in the JFrame
+		myContentPane.add(unsortedWords); 
+		//this will print on the left side
+		myContentPane.add(sortedWords); 
+		//this will print on the right side
+		for (int i=0; i<size; i++)
+			unsortedWords.append(words[i]+"\n");
+		selectionSort(words, size);
+		//method will alphabetize
+		for (int i=0;i<size; i++)
+			sortedWords.append(words[i]+"\n");
+		p1GUI.setVisible(true);
+	}
+	/**
+	 * 
+	 * @param array
+	 * @param size
+	 */
+	private static void selectionSort(String [] array, int size) {
+		// this method is used to alphabetize the array using selection sort
+		for (int i=0; i<size-1; i++) {
+			int indexLowest = i;
+			for (int j=i+1; j<size; j++)
+				if (array[j].compareTo(array[indexLowest]) < 0) {
+					indexLowest = j;
+				}
+			if (array[indexLowest] != array[i] ) {
+				//swaping the words
+				String temp = array[indexLowest];
+				array[indexLowest] = array[i];
+				array[i] = temp;
+			} //if
+		} //for i
+	} //method selection sort
+}
+
+package projects;
+import javax.swing.*;
+
+/**
+ * 
+ * @author amandakomsky
+ *
+ */
+public class Project1GUI extends JFrame{
+	//allowing the use of inheritance 
+	/**
+	 * 
+	 * @param title
+	 * @param height
+	 * @param width
+	 * @param loc1
+	 * @param loc2
+	 */
+	public Project1GUI( String title, int height, int width, int loc1, int loc2) { 
+		//constructor allows the set-up for title, width, length and location in main
+		setTitle(title);
+		setSize(height,width);
+		setLocation(loc1,loc2);
+		//this is to quit the program
+		setDefaultCloseOperation(EXIT_ON_CLOSE);  
+	} 
+	
+} //class Project1GUI
