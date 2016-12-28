@@ -1,0 +1,280 @@
+package Project4;
+/**
+ * 
+ * @author amandakomsky
+ *
+ * @param <E>
+ */
+//Using generalization 
+public class LinkedList <E> {
+	private ListNode<E> first;
+	private ListNode<E> last;
+	protected static int length=0;
+	/**
+	 * 
+	 * @param ln
+	 * @return
+	 */
+//	public int getCount(ListNode<E> ln) {
+//		ListNode<E> counter = first;
+//		int count = 0;
+//		while (counter != null) {
+//			count++;
+//			counter = counter.next;
+//		}
+//		return count;
+//	}
+	/**
+	 * 
+	 */
+	public LinkedList() {
+		ListNode<E> ln = new ListNode<E>();
+		first = ln;
+		last = ln;
+		length = 0;
+	}
+	public int getLength() {
+		return length;
+	}
+} // class LinkedList
+
+package Project4;
+/**
+ * 
+ * @author amandakomsky
+ *
+ * Making the constructor and class generic (with <E>)
+ *
+ * @param <E>
+ */
+public class ListNode <E> {
+	E data;
+	ListNode next;
+	/**
+	 * 
+	 * @param myData
+	 */
+	public ListNode(E myData) {
+		data = myData;
+		next = null;
+	}
+	/**
+	 * 
+	 */
+	public ListNode() {
+		data = null;
+		next = null;
+	}
+} // class ListNode
+
+package Project4;
+/**
+ * 
+ * @author amandakomsky
+ *
+ */
+public class Noun extends Word {
+	/**
+	 * 
+	 * @param n The noun
+	 */
+	public Noun(String n) {
+			super(n);
+	}
+	
+	// This will add "(N)" after the word
+	public String toString() {
+		return theWord + "(N)";
+	}
+} // class Noun
+
+package Project4;
+
+import java.util.HashMap;
+import java.util.TreeMap;
+import java.util.Iterator;
+import java.awt.*;
+import java.util.LinkedList;
+/**
+ * 
+ * @author amandakomsky
+ *
+ */
+public class Project4 {
+	/**
+	 * This is the main function
+	 * 
+	 * This will create a GUI called Project 4 and a new linked list.  It will then import words from a given file 
+	 * and instantiate each word as a verb or noun.  It will then display the words on the right side of the frame
+	 * in a HashMap and display the words on the left side of the frame as a TreeMap
+	 * 
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		Project4GUI p4GUI = new Project4GUI("Project 4");
+		LinkedList<Word> inputWords = new LinkedList<Word>();
+		//need to get the linked list from the words in the text file
+		inputFromFile("P4words", inputWords);	
+		//print these words to the GUI
+		printToGUI(p4GUI, inputWords);
+	}
+	/**
+	 * This method import the words using TextFileInput
+	 * 
+	 * @param filename The file used to import the words (nouns and verbs)
+	 * @param words The linked list that needs to be filled
+	 * @return
+	 */
+	public static void inputFromFile(String filename, LinkedList<Word> words) {
+		TextFileInput in = new TextFileInput(filename);
+		String line = in.readLine();
+		while (line != null) {
+			if (line.contains("(N)") ) { 
+				words.add(new Noun(line));
+			}
+			else if (line.contains("(V)") ){
+				words.add(new Verb(line));
+			}
+			line = in.readLine();
+		} //while
+		if (line != null) 
+			System.exit(1);
+		in.close();
+		//return lengthFilled;
+	} //method inputFromFile
+	/**
+	 * This method displays the HashMap and TreeMap on the right and left side of the GUI
+	 * 
+	 * @param p4gui
+	 * @param words
+	 */
+	public static void printToGUI(Project4GUI p4gui, LinkedList <Word> words) {
+		Container myContentPane = p4gui.getContentPane();
+		TextArea unsortedWords = new TextArea();
+		TextArea sortedWords = new TextArea();
+		myContentPane.add(unsortedWords);
+		myContentPane.add(sortedWords);
+		addHashMap(unsortedWords, words);
+		addTreeMap(sortedWords, words);
+		p4gui.setVisible(true);
+	}
+	/**
+	 * This method places the words into a HashMap
+	 * 
+	 * @param left
+	 * @param words
+	 */
+	public static void addHashMap(TextArea left, LinkedList<Word> words){
+		//Maps words from the input file using HashMap
+		HashMap<Word, String> hashMap = new HashMap<Word, String>();
+		for (int i=0; i<words.size(); i++) 
+			hashMap.put(words.get(i), "");
+		Iterator<Word> itr;
+		itr = hashMap.keySet().iterator();
+		while (itr.hasNext() ) {
+			left.append(itr.next() + "\n");
+		}
+	}
+	/**
+	 * This method places the given linked list into a Tree Map 
+	 * 
+	 * @param right
+	 * @param words
+	 * 
+	 */
+	public static void addTreeMap(TextArea right, LinkedList<Word>words ){
+		//Map words from the input file using TreeMap
+		TreeMap <String, String> treeMap = new TreeMap<String, String> ();
+		for (int i=0; i<words.size(); i++) {
+			treeMap.put(words.get(i).toString(), "");
+			//System.out.println(words.get(i));
+		}
+		Iterator<String> itr2;
+		itr2 = treeMap.keySet().iterator();
+		while (itr2.hasNext() ) {
+			right.append(itr2.next() + "\n");
+		}
+	}	
+} class Project4
+
+package Project4;
+
+import java.awt.GridLayout;
+import javax.swing.*;
+/**
+ * This is for the GUI used in Project 4
+ * @author amandakomsky
+ *
+ */
+public class Project4GUI extends JFrame {
+	/**
+	 * 
+	 * @param title 
+	 */
+	//Setting up the GUI
+	public Project4GUI(String title) {
+		setTitle(title);
+		setSize(600,1000);
+		setLocation(400,400);
+		setLayout(new GridLayout(1,2));
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setVisible(true);
+	}
+} // class Project4GUI
+
+package Project4;
+/**
+ * 
+ * @author amandakomsky
+ *
+ */
+public class Verb extends Word {
+	/**
+	 * 
+	 * @param v
+	 */
+	//This will instantiate the word
+	public Verb(String v) {
+		super(v);
+	}
+	
+	// This will take the word and then add "(V)" to it for words of class verb.
+	public String toString() {
+		return theWord + "(V)";
+	}
+} // class Verb
+
+package Project4;
+/**
+ * 
+ * @author amandakomsky
+ *
+ */
+public abstract class Word {
+	//make theWord protected in order to use it for subclasses of Word (like Verb and Noun)
+	protected String theWord;
+	/**
+	 * @param w The word
+	 */
+	public Word(String w) {
+			theWord = findWord(w);
+	}
+	/** 	
+	 * @param find - The Word that needs to be found
+	 * @return
+	 */
+	//this method takes the actual word without (V) or (N)
+	public String findWord(String find) {
+		int i = 0;
+		while (Character.isLetter(find.charAt(i)) )  
+			i++;
+		//return the word before the "(" comes
+		return find.substring(0,i);
+	}
+} // class Word
+
+
+
+
+
+
