@@ -1,0 +1,379 @@
+package project2;
+
+public class ListNode {
+	String data;
+	ListNode next;
+	/**
+	 * 
+	 * @param data
+	 * @param next
+	 */
+	public ListNode(String data, ListNode next) {
+		this.data = data;
+		this.next = next;
+	} //constructor
+	
+	public ListNode() {
+		this.data = null;
+		this.next = null;
+	} //constructor
+	/**
+	 * 
+	 * @param data
+	 */
+	public ListNode(String data) {
+		this.data = data;
+		this.next = null;
+	}// constructor
+	
+	
+} //class ListNode
+
+package project2;
+/**
+ * 
+ * @author amandakomsky
+ *
+ */
+public class LinkedList {
+	private ListNode first;
+	private ListNode last;
+	private int length = 0;
+	
+	public LinkedList() {
+		ListNode ln = new ListNode();
+		first = ln;
+		last = ln;
+	}
+	/**
+	 * 
+	 * @param s
+	 */
+	public void append (String s) {
+		ListNode n = new ListNode(s);
+		last.next = n;
+		last = n;
+		length++;
+	}
+	/**
+	 * 
+	 * @param s
+	 */
+	// allows new nodes to be appended but in correct alphabetical order
+	public void sortAppend(String s) {
+		ListNode node = new ListNode(s);
+		ListNode currentNode = first;
+		ListNode pointer = first.next;
+		//for the first
+		if (length == 0) {
+			append(s);
+			return;
+		}
+		// if it comes after the last 
+		else if(s.compareTo(last.data.toString()) > 0 ) {
+				append(s);
+				return;
+		}
+		// finding the right place to insert it, and correct the links
+		else {
+			while (s.compareTo(pointer.data.toString()) > 0) {
+				currentNode=pointer;
+				pointer = pointer.next;
+			}//while
+			currentNode.next = node;
+			currentNode.next.next = pointer;
+			length++;
+		}
+	}//insert
+	/**
+	 * 
+	 * @param p
+	 */
+	//need to remove the pointer of the desired word and skip over it my pointing to the next.
+	public void removeNode(String p) {
+		ListNode currentNode = first;
+		ListNode pointer = first.next;
+		if (p == null)
+			throw new IllegalArgumentException("null pointer");
+		while (p.compareTo(pointer.data.toString()) > 0 ) {
+			currentNode = pointer;
+			pointer = pointer.next;
+		}//while
+		currentNode.next = pointer.next;
+		currentNode.next.next = pointer.next.next;
+		length--;
+	}
+		
+	// parse nodes into Strings
+	public String toString() {
+		ListNode pointer = first;
+		String string="";
+		while (pointer.next != null) {
+			pointer = pointer.next;
+			string += (pointer.data.toString() + "\n");
+		}
+		return string;
+	}
+	
+} //class LinkedList
+
+package project2;
+
+public class LinkedListIterator {
+	private ListNode node;
+	
+	public LinkedListIterator(ListNode first) {
+		node = first;
+	}
+	
+	public boolean hasNext() {
+		return (node != null);
+	}
+	
+	public String next() {
+		if (node == null)
+			throw new NullPointerException("Linked list empty.");
+		String currentData = node.data;
+		node = node.next;
+		return currentData;
+	}
+} //class LinkedListIterator
+
+package project2;
+/**
+ * 
+ * @author amandakomsky
+ *
+ */
+public class Project2 {
+	/**
+	 * This is the main function
+	 * 
+	 * This will import a file, and read the words into two arrays- one sorted and one unsorted.
+	 * The words will also be inserted into a linked list in proper position to keep the list sorted.
+	 * The three list will be displayed in separate text areas in the GUI.  Then, a JOptionPane will pop
+	 * up and accept commands (add, delete, or stop). The displays will be updated as these commands come.
+	 * 
+	 * @param args
+	 */
+	public static void main (String[] args) {
+		/**
+		 * the file being read/imported
+		 */
+		String fileName = "Words"; 
+		/**
+		 * creating a GUI
+		 */
+		Project2GUI myGUI = new Project2GUI("Project2GUI"); 
+		/**
+		 * Instantiating the link to soon be filled
+		 */
+		LinkedList List = new LinkedList();
+		/**
+		 * the first array that will be filled with words unsorted
+		 */
+		String[] wordArray = fillArray(fileName, List); 
+		myGUI.displayArray(wordArray); // displays the first array into the left side of the GUI
+		/**
+		 * the second array that will be a sorted version of the first array
+		 */
+    	String[] sortedArray = sortArray(wordArray);
+    	myGUI.displaySortedArray(sortedArray); // displays the second, sorted, array into the middle of GUI
+    	myGUI.displayLinkedList(List); //displays the third, linked list into the right side of the GUI
+    	
+	} //main
+	/**
+	 * 
+	 * @param fileName
+	 * @param List
+	 * @return
+	 */
+	// This fillArray() method reads a file using TextFileInput(), places all the valid words from the file into an array, and then returns that array.
+	public static String [] fillArray (String fileName, LinkedList List) {
+		TextFileInput read = new TextFileInput(fileName); // inputs the file using TextFileInput
+		String line = read.readLine(); 
+		String [] words = new String[25];
+		int i = 0;
+		while (line != null) { 
+			if (isValid(line)) {
+				words[i++] = line;
+				List.sortAppend(line);
+			}
+			else System.out.println(line); // if the word is not valid, it prints it to the console
+			line = read.readLine();
+		} //while
+		return words;
+	} //fillArray
+ 
+	/**
+	 * 
+	 * @param word
+	 * @return
+	 */
+	// This isValid() method test whether a word is valid or not
+	private static boolean isValid(String word) {
+		for (int i = 0; i < word.length(); i++) {
+			if (!Character.isLetter(word.charAt(i))) { 
+				return false;
+			} //if
+		} //for
+		return true;
+	} //isValid
+   
+	/**
+	 * 
+	 * @param myArray
+	 * @return
+	 */
+	// This sortArray() method does a selection sort using compareTo on the existing array and places it into a new array
+	public static String[] sortArray(String[] myArray){
+		int lowestIndex;
+		for (int i = 0; i < myArray.length; i++) {
+			lowestIndex = i;
+			for (int j = i+1; j < myArray.length && myArray[j] != null; j++) {
+				if (myArray[j].compareTo(myArray[lowestIndex]) < 0) 
+					lowestIndex = j;
+			} //for
+			if (i != lowestIndex) { 
+				String temp = myArray[i];
+				myArray[i] = myArray[lowestIndex];
+				myArray[lowestIndex] = temp;
+			} //if
+		} //for
+		return myArray;
+	} //sortArray
+
+} //class Project2
+
+package project2;
+
+import java.awt.*;
+import java.util.*;
+import javax.swing.*;
+/**
+ * 
+ * @author amandakomsky
+ *
+ */
+public class Project2GUI {
+	/**
+	 * this will create a GUI
+	 */
+	JFrame p2JF;
+	//makes these static so can later be used to add or delete words to each.
+	public static StringTokenizer linkCommand;
+	public static StringTokenizer myTokens;
+	public static TextArea arrayArea1 = new TextArea();
+	public static TextArea arrayArea2 = new TextArea();
+	/**
+	 * 
+	 * @param title
+	 */
+	//this creates the setting for the GUI.
+	public Project2GUI(String title) {
+		p2JF = new JFrame();
+		p2JF.setSize(1000,600);
+		p2JF.setLocation(100,100);
+		p2JF.setTitle(title);
+		p2JF.setLayout(new GridLayout(1,3));
+		p2JF.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		p2JF.setVisible(true);
+	}//Project2GUI
+	/**
+	 * 
+	 * @param wordArray
+	 */
+	//display the unsorted array
+	public void displayArray(String[] wordArray) {
+		Container myContentPane = p2JF.getContentPane();
+		//TextArea arrayArea = new TextArea();
+		arrayArea1.setEditable(true);
+		for (int i=0; i<wordArray.length; i++) {
+			if (wordArray[i] != null )
+				arrayArea1.append(wordArray[i] + "\n");
+		}
+		myContentPane.add(arrayArea1); 
+		p2JF.setVisible(true);
+	}//displayArray
+	/**
+	 * 
+	 * @param wordArray
+	 */
+	//display the sorted array
+	public void displaySortedArray(String[] wordArray) {
+		Container myContentPane = p2JF.getContentPane();
+		//TextArea arrayArea = new TextArea();
+		arrayArea2.setEditable(true);
+		for (int i=0; i<wordArray.length; i++) {
+			if (wordArray[i] != null )
+				arrayArea2.append(wordArray[i] + "\n");
+		}
+		myContentPane.add(arrayArea2); 
+		p2JF.setVisible(true);
+	}//displayArray
+	/**
+	 * 
+	 * @param sortList
+	 */
+	//display the linked list and in the method, begin allowing the commands.
+	public void displayLinkedList (LinkedList sortList) {
+		Container myContentPane = p2JF.getContentPane();
+		TextArea sorted = new TextArea();
+		sorted.setEditable(true);
+		sorted.append(sortList.toString());
+		myContentPane.add(sorted);
+		p2JF.setVisible(true);
+		edit(sorted,sortList);	// to edit each.
+	}
+	/**
+	 * 
+	 * @param editText
+	 * @param list
+	 */
+	//this will open and JOptionPane and receive commands.  The lists and arrays will be updated as well.
+	public void edit (TextArea editText, LinkedList list) {
+		//keeps the commands coming continuously until command "Stop"
+		while (true) { 
+    		String sentence = JOptionPane.showInputDialog(null, "Enter command:");
+    		/**
+    		 * this creates a stringTokenizer to separate the command from the words it is referring to
+    		 */
+    		linkCommand = new StringTokenizer(sentence," ");
+    		/**
+    		 * the command will be the first word.
+    		 */
+    		String command = linkCommand.nextToken();
+    		//end the program
+    		if (command.equalsIgnoreCase("STOP"))
+    			System.exit(0);
+    		/**
+    		 * this is the second part of linkCommand- The words needed to be commanded
+    		 */
+    		String line = linkCommand.nextToken();
+    		/**
+    		 * how to distinguish different words
+    		 */
+    		myTokens = new StringTokenizer(line,",");
+    		String[] links = new String[myTokens.countTokens()];
+    		
+    		if (command.equalsIgnoreCase("ADD")) {
+    			int i = 0;
+    			while (myTokens.hasMoreTokens()) {
+    				links[i] = myTokens.nextToken();
+    				list.sortAppend(links[i]);
+    				arrayArea1.append(links[i].toString() + "\n");
+    				arrayArea2.append(links[i].toString() + "\n");
+    				i++;
+    			} 
+    		}
+    		if (command.equalsIgnoreCase("DELETE")){
+    				String delete = myTokens.nextToken();
+    				list.removeNode(delete);
+    		}
+    		//this clears the old text so the same list does not get displayed numerous times in the GUI
+    		editText.setText("");
+    		//show the updated text to the GUI
+    		editText.setText(list.toString());	
+		} //while
+	} //edit		
+}//class Project2GUI
