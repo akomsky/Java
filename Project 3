@@ -1,0 +1,638 @@
+package project3;
+import java.awt.Container;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.*;
+/**
+ * This class will allow the display button in the menu to 
+ * actually function.  It will make the noun button display only
+ * nouns on way side sorted, and the nouns sorted on the other
+ * side of the GUI
+ * 
+ * @author amandakomsky
+ *
+ */
+public class DisplayMenuHandler implements ActionListener {
+	
+	private JFrame jframe;
+	/**
+	 * 
+	 * @param jf The jframe
+	 */
+	public DisplayMenuHandler (JFrame jf) {
+		jframe = jf;
+	}
+	/**
+	 * this method provides actions for each command
+	 */
+	public void actionPerformed(ActionEvent event) {
+		String menuName;
+		menuName = event.getActionCommand();
+		if (menuName.equals("Noun")) {
+			DisplayNoun();
+			jframe.setVisible(true);
+		}
+		if (menuName.equals("Verb"))
+			DisplayVerb();
+			jframe.setVisible(true);
+	}
+	/**
+	 * this method goes through the lists and sees which Words are nouns.
+	 */
+	public static void DisplayNoun() {
+		Container myContentPane = FileMenuHandler.getContentPane2() ;
+		//this clears the old content pane so the new one can be displayed
+		myContentPane.removeAll();
+		//this creates 2 text areas: one for the sorted noun and the other for unsorted nouns
+		JTextArea unsortedN = new JTextArea();
+		JTextArea sortedN = new JTextArea();
+		//clear the texts areas
+		unsortedN.setText("");
+		sortedN.setText("");
+		//need to get the lists that were originally imported from the file when "open" was clicked.
+		WordList unsortedlist = FileMenuHandler.getListUnsorted() ;
+		WordList sortedlist = FileMenuHandler.getListSorted();
+		//check if the words in the list are instances of noun. If they are, display them in 
+		//the respective list
+		for (int i=0; i<unsortedlist.getLength(); i++ ){ //the length of each list is the same (sorted or unsorted)
+			if (unsortedlist.get(i) instanceof Noun)  
+				unsortedN.append(unsortedlist.get(i).toString() + "\n");
+			if (sortedlist.get(i) instanceof Noun)
+				sortedN.append(sortedlist.get(i).toString() + "\n");
+		}
+		myContentPane.add(unsortedN);
+		myContentPane.add(sortedN);
+		
+	}
+	/**
+	 * this method goes through each lists and sees which Words are verbs. 
+	 */
+	public static void DisplayVerb() {
+		Container myContentPane = FileMenuHandler.getContentPane2() ;
+		myContentPane.removeAll();
+		JTextArea unsortedV = new JTextArea();
+		JTextArea sortedV = new JTextArea();
+		unsortedV.setText("");
+		sortedV.setText("");
+		WordList unsortedlist = FileMenuHandler.getListUnsorted() ;
+		WordList sortedlist = FileMenuHandler.getListSorted();
+		for (int i=0; i<unsortedlist.getLength(); i++ ) { //the length of each list is the same (sorted or unsorted)
+			if (unsortedlist.get(i) instanceof Verb)  
+				unsortedV.append(unsortedlist.get(i).toString() + "\n");
+			if (sortedlist.get(i) instanceof Verb)
+				sortedV.append(sortedlist.get(i).toString() + "\n");
+		}
+		myContentPane.add(unsortedV);
+		myContentPane.add(sortedV);	
+	}
+} // class DisplayMenuHandler
+
+package project3;
+
+import java.awt.Container;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.StringTokenizer;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JTextArea;
+
+public class EditMenuHandler implements ActionListener {
+	
+	private JFrame jframe;
+	/**
+	 * 
+	 * @param jf The jframe
+	 */
+	public EditMenuHandler (JFrame jf) {
+		jframe = jf;
+	}
+	
+	public void actionPerformed(ActionEvent event) {
+		String menuName;
+		menuName = event.getActionCommand();
+		if (menuName.equals("Command box")) {
+			OpenCommandBox();
+			jframe.setVisible(true);
+		}
+	}
+		public static void OpenCommandBox() {
+			StringTokenizer wordCommand;
+			StringTokenizer myTokens;
+			while (true) { 
+	    		String sentence = JOptionPane.showInputDialog(null, "Enter command:");
+	    		/**
+	    		 * this creates a stringTokenizer to separate the command from the words it is referring to
+	    		 */
+	    		wordCommand = new StringTokenizer(sentence," ");
+	    		/**
+	    		 * the command will be the first word.
+	    		 */
+	    		String command = wordCommand.nextToken();
+	    		//end the program
+	    		if (command.equalsIgnoreCase("STOP"))
+	    			return;
+	    		/**
+	    		 * this is the second part of wordCommand- The words needed to be commanded
+	    		 */
+	    		String line = wordCommand.nextToken();
+	    		/**
+	    		 * how to distinguish different words
+	    		 */
+	    		myTokens = new StringTokenizer(line,",");
+	    		
+	    		Container myContentPane = FileMenuHandler.getContentPane2() ;
+	    		myContentPane.removeAll();
+	    		JTextArea unsorted = new JTextArea();
+	    		JTextArea sorted = new JTextArea();
+//	    		unsortedV.setText("");
+//	    		sortedV.setText("");
+	    		WordList unsortedlist = FileMenuHandler.getListUnsorted() ;
+	    		WordList sortedlist = FileMenuHandler.getListSorted();
+	    		
+	    		//This will add new verbs and nouns
+	    		if (command.equalsIgnoreCase("ADD")) {
+	    			while (myTokens.hasMoreTokens()) {
+	    				String addWord = myTokens.nextToken();
+	    				if (addWord.contains("(N)") ) { 
+	    					unsortedlist.Add(new Noun(addWord));
+	    					sortedlist.Add(new Noun(addWord));
+	    				}
+	    				else if(addWord.contains("(V)")) {
+	    					unsortedlist.Add(new Verb(addWord));
+	    					sortedlist.Add(new Verb(addWord));
+	    				}
+	    				unsorted.append(unsortedlist.toString());
+	    				sorted.append(sortedlist.toString());
+	    				myContentPane.add(unsorted);
+	    				myContentPane.add(sorted);
+	    				
+	    			}
+	    		}
+	    		//this will delete the given word
+	    		if (command.equalsIgnoreCase("DELETE")){
+	    			String delete = myTokens.nextToken();
+	    			unsortedlist.removeNode(delete);
+	    			sortedlist.removeNode(delete);
+	    			unsorted.append(unsortedlist.toString());
+	    			sorted.append(sortedlist.toString());
+	    			myContentPane.add(unsorted);
+	    			myContentPane.add(sorted);
+	    		}
+	    		//clear the text areas so can add the new changed lists
+	    		unsorted.setText("");
+	    		sorted.setText("");
+	    		unsorted.setText(unsortedlist.toString());
+	    		sorted.setText(sortedlist.toString());
+			} //while
+		}	
+} // class EditMenuHandler
+
+package project3;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.*;
+
+public class FileMenuHandler implements ActionListener {
+	
+	//use in other classes
+	private JFrame jframe;
+	public static UnsortedWordList unsorted = new UnsortedWordList();
+	public static SortedWordList sorted = new SortedWordList();
+	public static Container myGLOBALContentPane = null;
+	
+	/**
+	 * 
+	 * @param jf
+	 */
+	public FileMenuHandler (JFrame jf) {
+		jframe = jf;
+	}
+	/**
+	 * This gives action to each item of file
+	 */
+	public void actionPerformed(ActionEvent event) {
+		String menuName;
+		menuName = event.getActionCommand();
+		if (menuName.equals("Open"))
+			openFile();
+		else if (menuName.equals("Quit"))
+			System.exit(0);
+	} //actionPerformed
+	//This opens the file 
+	public void openFile() {
+		int status;
+		JFileChooser chooser = new JFileChooser();
+		status = chooser.showOpenDialog(null);
+		readSource(chooser.getSelectedFile());
+	} //openFile
+	/**
+	 * 
+	 * @param chosenFile The file the user chooses.
+	 */
+	private void readSource(File chosenFile) {
+		String chosenFileName = chosenFile.getAbsolutePath();
+		TextFileInput inFile = new TextFileInput(chosenFileName);
+		String words;
+		myGLOBALContentPane = jframe.getContentPane();
+		JTextArea unsortedList = new JTextArea();
+		JTextArea sortedList = new JTextArea();
+		myGLOBALContentPane.add(unsortedList);
+		myGLOBALContentPane.add(sortedList);
+		words= inFile.readLine();
+
+		while (words!= null) {
+			//words = words.toString();
+			//words = new Words(words);
+			if (words.contains("(N)") ) { 
+					unsorted.Add(new Noun(words));
+					sorted.Add(new Noun(words));
+			} //Instantiate the word that is a noun as class noun to each list
+			else if(words.contains("(V)")) {
+				unsorted.Add(new Verb(words));
+				sorted.Add(new Verb(words));
+			} //Instantiate the word that is a verb as class verb to each list
+			words = inFile.readLine();
+		}//while
+		unsortedList.append(unsorted.toString());
+		sortedList.append(sorted.toString());
+		jframe.setVisible(true);
+	}
+	//this will get the unsorted word list from the text received from "File, Open"
+	 public static WordList getListUnsorted (){
+	      return unsorted;
+	   }
+	 //this will get the sorted word list from the text recieved from "File, Open" 
+	 public static WordList getListSorted() {
+		 return sorted;
+	 }
+	 //this gets the content pane from project3
+	 public static Container getContentPane2() {
+		 return myGLOBALContentPane;
+	 }
+} // class FileMenuHandler
+
+package project3;
+/**
+ * 
+ * @author amandakomsky
+ *
+ */
+public class Noun extends Word {
+	/**
+	 * 
+	 * @param n
+	 */
+	// This is from the abstact top class Word
+	public Noun(String n) {
+			super(n);
+	}
+	/**
+	 * 
+	 */
+	// This will add "(N)" after the word
+	public String toString() {
+		return theWord + "(N)";
+	}
+} // class Noun
+
+package project3;
+/**
+ * 
+ * @author amandakomsky
+ *
+ */
+public class Project3 {
+	
+	//this is making the GUI global. 
+	static Project3GUI p3gui;
+	/**
+	 * This calls on the main function
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		//Instantiating a new GUI from class Project3GUI
+		p3gui = new Project3GUI("Project 3");
+	}
+} // class Project3
+
+package project3;
+import java.awt.*;
+import javax.swing.*;
+/**
+ * This class is the GUI used in Project 3
+ * @author amandakomsky
+ *
+ */
+public class Project3GUI extends JFrame {
+	/**
+	 *This constructor sets of the GUI- making it a grid lay with 2 sides.
+	 * 
+	 * @param title The title of the GUI
+	 */
+	public Project3GUI(String title) {
+		setTitle(title);
+		setSize(600,1000);
+		setLocation(400,400);
+		createMenu();
+		setLayout(new GridLayout(1,2));
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setVisible(true);
+	}
+	/**
+	 * This is the method that will create the menu bar in the GUI.
+	 * There will be a file button that creates a drop boxes with option 
+	 * to either open a file or to quit the program.
+	 */
+	public void createMenu() {
+		JMenuBar menuBar = new JMenuBar();
+		
+		//creating the File button
+		//to open a file and quit the program.
+		JMenu fileMenu = new JMenu("File");
+		JMenuItem item;
+		FileMenuHandler fmh = new FileMenuHandler(this);
+		item = new JMenuItem("Open");
+		item.addActionListener(fmh);
+		fileMenu.add(item);
+		fileMenu.addSeparator();
+		item = new JMenuItem("Quit");
+		item.addActionListener(fmh);
+		fileMenu.add(item);
+		
+		//creating the Display button
+		//to either display on nouns or only verbs from each list.
+		JMenu displayMenu = new JMenu("Display");
+		//JMenuItem  item2;
+		DisplayMenuHandler dmh = new DisplayMenuHandler(this);
+		item = new JMenuItem("Noun");
+		item.addActionListener(dmh);
+		displayMenu.add(item);
+		displayMenu.addSeparator();
+		item = new JMenuItem("Verb");
+		item.addActionListener(dmh);
+		displayMenu.add(item);
+		
+		//creating the Edit button
+		//This will open a JOptionPane that will accept commands.
+		JMenu editMenu = new JMenu("Edit");
+		EditMenuHandler emh = new EditMenuHandler(this);
+		item = new JMenuItem("Command box");
+		item.addActionListener(emh);
+		editMenu.add(item);
+		
+		setJMenuBar(menuBar);
+		menuBar.add(fileMenu);
+		menuBar.add(displayMenu);
+		menuBar.add(editMenu);
+	}
+} // class Project3GUI
+
+package project3;
+/**
+ * 
+ * @author amandakomsky
+ *
+ */
+public class SortedWordList extends WordList {
+	/**
+	 * Need method to create the SortedWordList
+	 */
+	public SortedWordList() {
+		WordNode empty = new WordNode();
+		this.first = empty;
+		this.last = empty;
+	}
+	/**
+	 * This Add method is catered specifically for sorted lists. 
+	 * It will add the new Words (noun or verbs) to the list in sorted order
+	 */
+	public void Add(Word word) {
+		WordNode node = new WordNode(word);
+		WordNode currentNode = first;
+		WordNode pointer = first.next;
+		//for the first
+		if (length == 0) {
+			append(word);
+			return;
+		}
+		// if it comes after the last 
+		else if(word.toString().compareTo(last.data.toString()) > 0 ) {
+				append(word);
+				return;
+		}
+		// finding the right place to insert it, and correct the links
+		else {
+			while (word.toString().compareTo(pointer.data.toString()) > 0) {
+				currentNode=pointer;
+				pointer = pointer.next;
+			}//while
+			currentNode.next = node;
+			currentNode.next.next = pointer;
+			length++;
+		}
+	}
+} // class SortedWordList
+
+package project3;
+/**
+ * 
+ * @author amandakomsky
+ *
+ */
+public class UnsortedWordList extends WordList {
+
+	public UnsortedWordList() {
+		WordNode empty = new WordNode();
+		this.first = empty;
+		this.last = empty;
+	}
+	/**
+	 * 
+	 */
+	public void Add(Word word) {
+		WordNode w = new WordNode(word);
+		last.next = w;
+		last = w;
+		++length;
+	}
+	/**
+	 * 
+	 */
+	public void resetList(){
+		WordNode empty = new WordNode();
+		this.first = empty;
+		this.last = empty;
+		this.length = 0;
+	}
+} // class UnsortedWordList
+
+package project3;
+
+public class Verb extends Word {
+	/**
+	 * 
+	 * @param v
+	 */
+	// this is connected to the abstract Class Word
+	public Verb(String v) {
+		super(v);
+	}
+	// This will take the word and then add "(V)" to it for words of class verb.
+	public String toString() {
+		return theWord + "(V)";
+	}
+} // class Verb
+
+package project3;
+
+public abstract class Word {
+	//this allows the word to be used in all of the lower extensions
+	protected String theWord;
+	/**
+	 * @param w
+	 */
+	public Word(String w) {
+			theWord = findWord(w);
+	}
+	/** 	
+	 * @param find
+	 * @return
+	 */
+	//this method takes the actual word without (V) or (N)
+	public String findWord(String find) {
+		int i = 0;
+		while (Character.isLetter(find.charAt(i)) )  
+			i++;
+		//return the word before the "(" comes
+		return find.substring(0,i);
+	}
+} // class Word
+
+package project3;
+
+public abstract class WordList {
+	//This will be used for both the sorted and unsorted word list.  The methods will differ in each class
+	abstract void Add(Word w);
+	
+	protected WordNode first = new WordNode(null);
+	protected WordNode last = first;
+	protected WordNode next = last.next;
+	protected int length = 0;
+	
+	public int getLength() {
+		return length;
+	}
+	/**
+	 * 
+	 * @param w The word to be appended
+	 */
+	public void append(Word w) {
+		WordNode n = new WordNode(w);
+		last.next = n;
+		last = n;
+		++length;
+	} //append
+	/**
+	 * 
+	 */
+	public String toString() {
+		WordNode pointer = first.next;
+		String string="";
+		while (pointer != null) {
+			string += (pointer.data.toString() + "\n");
+			pointer = pointer.next;
+		}
+		return string;
+	}
+	/**
+	 * 
+	 * @param index 
+	 * @return
+	 */
+	public Object get(int index) {
+		// returns the element at the specified position in this list.
+			// index must be 1 or higher
+			if (index <= 0)
+				return null;
+			WordNode Current = null;
+			if (first != null) {
+				Current = first;//.getNext();
+				for (int i = 0; i < index; i++) {
+					if (Current.getNext() == null)
+						return null;
+	 
+					Current = Current.getNext();
+				}
+				return Current.getData();
+			}
+			return Current;
+	}
+	/**
+	 * 
+	 * @param p The word that needs to be deleted
+	 */
+	public void removeNode(String p) {
+		WordNode currentNode = first;
+		WordNode pointer = first.next;
+		if (p == null)
+			throw new IllegalArgumentException("null pointer");
+		while (p.compareTo(pointer.data.toString()) > 0 ) {
+			currentNode = pointer;
+			pointer = pointer.next;
+		}//while
+		currentNode.next = pointer.next;
+		currentNode.next.next = pointer.next.next;
+		length--;
+	}
+} // class WordList
+
+package project3;
+
+public class WordNode {
+	/**
+	 * 
+	 */
+	protected Word data;
+	protected WordNode next;
+	
+	public WordNode() {
+		data = null;
+		next = null;
+	} //constructor with no arguments
+	/**
+	 * 
+	 * @param w
+	 */
+	public WordNode(Word w) {
+		data = w;
+		next = null;
+	} //constructor
+	/**
+	 * 
+	 * @return
+	 */
+	public Word getData() {
+		return data;
+	}
+	/**
+	 * 
+	 * @return
+	 */
+	public WordNode getNext() {
+		return next;
+	}
+} // class WordNode
+
+
+
+
+
+
+
+
+
+
+
+
